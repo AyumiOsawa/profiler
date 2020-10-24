@@ -4,8 +4,6 @@
 
 // @flow
 import * as React from 'react';
-import memoize from 'memoize-immutable';
-import NamedTupleMap from 'namedtuplemap';
 import classNames from 'classnames';
 import explicitConnect from 'firefox-profiler/utils/connect';
 import {
@@ -294,18 +292,6 @@ export const withChartViewport: WithChartViewport<*, *> =
           this._setSizeNextFrame();
         }
       }
-
-      horizontalViewportMemoized = memoize(
-        (props: ViewportProps) => {
-          const { previewSelection, timeRange } = props.viewportProps;
-          const horizontalViewport = this.getHorizontalViewport(
-            previewSelection,
-            timeRange
-          );
-          return horizontalViewport;
-        },
-        { cache: new NamedTupleMap() }
-      );
 
       componentDidUpdate(newProps: ViewportProps) {
         if (
@@ -802,8 +788,10 @@ export const withChartViewport: WithChartViewport<*, *> =
           isSizeSet,
         } = this.state;
 
-        const { viewportLeft, viewportRight } = this.horizontalViewportMemoized(
-          this.props
+        const { previewSelection, timeRange } = this.props.viewportProps;
+        const { viewportLeft, viewportRight } = this.getHorizontalViewport(
+          previewSelection,
+          timeRange
         );
 
         const viewportClassName = classNames(
